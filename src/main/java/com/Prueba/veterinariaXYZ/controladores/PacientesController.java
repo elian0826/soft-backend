@@ -74,7 +74,7 @@ public class PacientesController {
             msg.setMensaje("Paciente obtenido exitosamente");
         } catch (RuntimeException e) {
             msg.setId("1");
-            msg.setMensaje("Error al obtener: " + e.getMessage());
+            msg.setMensaje("No existe: " + e.getMessage());
         }
         return ResponseEntity.ok(msg);
     }
