@@ -1,11 +1,8 @@
 package com.Prueba.veterinariaXYZ.controladores;
 
 import com.Prueba.veterinariaXYZ.cu.AdmonPacientes;
-import com.Prueba.veterinariaXYZ.cu.ExcelService;
-import com.Prueba.veterinariaXYZ.dominio.entidades.Pacientes;
 import com.Prueba.veterinariaXYZ.dto.PacientesDto;
 import com.Prueba.veterinariaXYZ.dto.Mensaje;
-import com.Prueba.veterinariaXYZ.mapper.PacientesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pacientes")
@@ -25,8 +21,6 @@ public class PacientesController {
     @Autowired
     private AdmonPacientes admonPacientes;
 
-    @Autowired
-    private ExcelService excelService;
 
     @PostMapping("/registrar")
     public ResponseEntity<Mensaje> insertar(@RequestBody PacientesDto pacienteDto) {
