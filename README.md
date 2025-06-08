@@ -198,17 +198,6 @@ PUT /api/pacientes/actualizar
   - Dirección
   - Teléfono
 
-## Convenciones de Documentación
-Se utilizan los siguientes bloques para destacar información importante en la documentación:
-
-> [!NOTE]
-> Aquí tienes una nota especial.
-
-> [!TIP]
-> Aquí tienes un consejo útil.
-
-> [!IMPORTANT]
-> Aquí tienes información importante.
 
 ## Capturas de Pantalla
 
