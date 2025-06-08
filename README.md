@@ -213,13 +213,13 @@ Se utilizan los siguientes bloques para destacar información importante en la d
 ## Capturas de Pantalla
 
 ### Swagger UI
-![Swagger UI](docs/images/swagger-ui.png)
+![Swagger UI](docs/images/SWAGGER.png)
 
 ### Base de Datos
-![Esquema de Base de Datos](docs/images/db-schema.png)
+![Esquema de Base de Datos](docs/images/BD.png)
 
 ### Credenciales de Acceso
-![Credenciales de Acceso](docs/images/login-prompt.png)
+![Credenciales de Acceso](docs/images/LOGIN.png)
 > [!NOTE]
 > Las credenciales de acceso para la autenticación básica son:
 > - **Usuario**: `Elian`
