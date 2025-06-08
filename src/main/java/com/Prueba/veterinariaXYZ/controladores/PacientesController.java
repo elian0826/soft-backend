@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -21,9 +23,8 @@ public class PacientesController {
     @Autowired
     private AdmonPacientes admonPacientes;
 
-
     @PostMapping("/registrar")
-    public ResponseEntity<Mensaje> insertar(@RequestBody PacientesDto pacienteDto) {
+    public ResponseEntity<Mensaje> insertar(@Valid @RequestBody PacientesDto pacienteDto) {
         Mensaje msg = new Mensaje();
         try {
             admonPacientes.insert(pacienteDto);
@@ -37,7 +38,7 @@ public class PacientesController {
     }
 
     @PutMapping("/actualizar")
-    public ResponseEntity<Mensaje> actualizar(@RequestBody PacientesDto pacienteDto) {
+    public ResponseEntity<Mensaje> actualizar(@Valid @RequestBody PacientesDto pacienteDto) {
         Mensaje msg = new Mensaje();
         try {
             admonPacientes.update(pacienteDto);
@@ -95,29 +96,49 @@ public class PacientesController {
     }
 
     @GetMapping("/exportar")
-    public ResponseEntity<ByteArrayResource> exportarPacientes() {
+    public ResponseEntity<?> exportarPacientes() {
         try {
             byte[] excelFile = admonPacientes.exportarPacientes();
-            
             ByteArrayResource resource = new ByteArrayResource(excelFile);
-            
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pacientes.xlsx")
                     .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .contentLength(excelFile.length)
                     .body(resource);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
+            Mensaje msg = new Mensaje();
+            msg.setId("1");
+            msg.setMensaje("Error al exportar archivo: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(msg);
         }
     }
 
     @PostMapping(value = "/importar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> importarPacientes(@RequestPart("file") MultipartFile file) {
+    public ResponseEntity<Mensaje> importarPacientes(@RequestPart("file") MultipartFile file) {
+        Mensaje msg = new Mensaje();
+
+        if (file.isEmpty()) {
+            msg.setId("1");
+            msg.setMensaje("El archivo está vacío.");
+            return ResponseEntity.badRequest().body(msg);
+        }
+
+        if (!file.getContentType().equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            msg.setId("1");
+            msg.setMensaje("Tipo de archivo no válido. Solo se permiten archivos Excel (.xlsx)");
+            return ResponseEntity.badRequest().body(msg);
+        }
+
         try {
             admonPacientes.importarPacientes(file);
-            return ResponseEntity.ok("Archivo importado correctamente");
+            msg.setId("0");
+            msg.setMensaje("Archivo importado correctamente");
+            return ResponseEntity.ok(msg);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Error al procesar el archivo: " + e.getMessage());
+            msg.setId("1");
+            msg.setMensaje("Error al procesar el archivo: " + e.getMessage());
+            return ResponseEntity.badRequest().body(msg);
         }
     }
 }
