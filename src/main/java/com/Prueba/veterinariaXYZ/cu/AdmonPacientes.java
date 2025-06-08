@@ -24,7 +24,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
 
     @Autowired
     private PacientesDmInterfaz pacientesDmInterfaz;
-    
+
     @Override
     public void insert(PacientesDto dto) {
         try {
@@ -46,7 +46,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
         try {
             pacientesDmInterfaz.deletePaciente(id);
         } catch (DmException e) {
@@ -55,7 +55,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     }
 
     @Override
-    public PacientesDto findById(int id) {
+    public PacientesDto findById(Integer id) {
         try {
             return PacientesMapper.mapper.toPacientesDto(
                     pacientesDmInterfaz.getPacienteById(id));
@@ -118,8 +118,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     @Transactional
     public void importarPacientes(MultipartFile file) throws IOException {
 
-        /* 1️⃣  Cachear todos los pacientes existentes en un Map
-               clave = identificacionDueno|nombreMascota                 */
+        /* 1️⃣  Cachear pacientes existentes --------------- */
         Map<String, PacientesDto> existentes = findAll().stream()
                 .collect(Collectors.toMap(
                         p -> key(p.getIdentificacion_dueno(), p.getNombre_mascota()),
@@ -129,12 +128,19 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
         try (Workbook wb = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = wb.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
-            if (rows.hasNext()) rows.next(); // saltar encabezado
+            if (rows.hasNext()) rows.next();                      // salto encabezado
 
             while (rows.hasNext()) {
                 Row row = rows.next();
-
                 PacientesDto dto = new PacientesDto();
+
+                /* 🔹 1. LEER ID (si lo hay) */
+                String idStr = getStringCellValue(row.getCell(0));
+                if (!idStr.isBlank()) {                    // ⇢ valor en la celda ID
+                    dto.setId(Integer.parseInt(idStr.trim()));
+                }
+
+                /* 🔹 2. Resto de columnas */
                 dto.setNombre_mascota(getStringCellValue(row.getCell(1)));
                 dto.setEspecie        (getStringCellValue(row.getCell(2)));
                 dto.setRaza           (getStringCellValue(row.getCell(3)));
@@ -149,18 +155,25 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
                 dto.setDireccion                 (getStringCellValue(row.getCell(9)));
                 dto.setTelefono                  (getStringCellValue(row.getCell(10)));
 
-                String key = key(dto.getIdentificacion_dueno(), dto.getNombre_mascota());
-
-                if (existentes.containsKey(key)) {
-                    dto.setId(existentes.get(key).getId());
+                /* 🔹 3. Decidir INSERT / UPDATE */
+                if (dto.getId() != null && dto.getId() > 0) {
+                    // El archivo ya traía ID explícito  →  UPDATE directo
                     update(dto);
                 } else {
+                    // No hay ID, usamos la clave compuesta para saber si existe
+                    String key = key(dto.getIdentificacion_dueno(), dto.getNombre_mascota());
 
-                    insert(dto);
+                    if (existentes.containsKey(key)) {         // existe  →  UPDATE
+                        dto.setId(existentes.get(key).getId());
+                        update(dto);
+                    } else {                                   // nuevo  →  INSERT
+                        insert(dto);
+                    }
                 }
             }
         }
     }
+
 
     /* ====================================================== *
      *  Helpers

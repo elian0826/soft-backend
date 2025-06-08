@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Pacientes {
-    private int id;
+    private Integer  id;
     private String nombre_mascota;
     private String especie;
     private String raza;
@@ -20,13 +20,14 @@ public class Pacientes {
     private LocalDateTime updated_at;
 
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
+
 
     public String getNombre_mascota() {
         return nombre_mascota;

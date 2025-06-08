@@ -70,7 +70,7 @@ public class PacientesDao implements PacientesDaoInterfaz {
     }
 
     @Override
-    public void delete(int id) throws DaoException {
+    public void delete(Integer id) throws DaoException {
         String sql = "DELETE FROM pacientes WHERE id = ?";
         try {
             jdbcTemplate.update(sql, id);

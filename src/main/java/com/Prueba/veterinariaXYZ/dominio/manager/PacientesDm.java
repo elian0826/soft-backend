@@ -33,7 +33,7 @@ public class PacientesDm implements PacientesDmInterfaz {
     }
 
     @Override
-    public void deletePaciente(int id) throws DmException {
+    public void deletePaciente(Integer id) throws DmException {
         try {
             pacientesDao.delete(id);
         } catch (DaoException e) {
@@ -42,7 +42,7 @@ public class PacientesDm implements PacientesDmInterfaz {
     }
 
     @Override
-    public Pacientes getPacienteById(int id) throws DmException {
+    public Pacientes getPacienteById(Integer id) throws DmException {
         try {
             return pacientesDao.findById(id);
         } catch (DaoException e) {

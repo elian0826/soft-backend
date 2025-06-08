@@ -10,9 +10,9 @@ public interface AdmonPacientesInterfaz {
 
     void insert(PacientesDto dto)  throws RuntimeException;
     void update(PacientesDto dto)  throws RuntimeException;
-    void delete(int id)            throws RuntimeException;
+    void delete(Integer id) throws RuntimeException;
+    PacientesDto findById(Integer id) throws RuntimeException;
 
-    PacientesDto      findById(int id)   throws RuntimeException;
     List<PacientesDto> findAll()         throws RuntimeException;
     
     // Nuevos métodos para importación/exportación

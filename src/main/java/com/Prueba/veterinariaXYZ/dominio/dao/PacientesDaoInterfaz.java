@@ -7,7 +7,7 @@ import java.util.List;
 public interface PacientesDaoInterfaz {
     void insert(Pacientes paciente) throws DaoException;
     void update(Pacientes paciente) throws DaoException;
-    void delete(int id) throws DaoException;
+    public void delete(Integer id) throws DaoException;
     Pacientes findById(int id) throws DaoException;
     List<Pacientes> findAll() throws DaoException;
 }
