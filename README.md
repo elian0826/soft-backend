@@ -218,7 +218,7 @@ PUT /api/pacientes/actualizar
 
 1. Clonar el repositorio
 ```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone [https://github.com/elian0826/soft-backend.git]
 ```
 
 2. Configurar la base de datos
@@ -244,13 +244,3 @@ mvn spring-boot:run
 5. Acceder a la aplicación
 - API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
-
-## Contribución
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Licencia
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles. 
