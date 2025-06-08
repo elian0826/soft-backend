@@ -213,10 +213,17 @@ Se utilizan los siguientes bloques para destacar información importante en la d
 ## Capturas de Pantalla
 
 ### Swagger UI
-[Agregar captura de pantalla de Swagger UI]
+![Swagger UI](docs/images/swagger-ui.png)
 
 ### Base de Datos
-[Agregar captura de pantalla de la estructura de la base de datos]
+![Esquema de Base de Datos](docs/images/db-schema.png)
+
+### Credenciales de Acceso
+![Credenciales de Acceso](docs/images/login-prompt.png)
+> [!NOTE]
+> Las credenciales de acceso para la autenticación básica son:
+> - **Usuario**: `Elian`
+> - **Contraseña**: `Elian0826*`
 
 ## Instalación y Ejecución
 
