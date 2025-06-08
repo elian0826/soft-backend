@@ -3,11 +3,15 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<!-- ────────────────────────────────
+         Spring Boot BOM / Parent
+    ──────────────────────────────────── -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.6</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>   <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>com.Prueba</groupId>
@@ -16,25 +20,45 @@
 	<name>veterinariaXYZ</name>
 	<description>Sistema de gestión para veterinaria XYZ</description>
 
+	<!-- ────────────────────────────────
+         Propiedades clave
+    ──────────────────────────────────── -->
 	<properties>
+		<!-- Java -->
 		<java.version>21</java.version>
+
+		<!-- Sobrescribimos las versiones que Spring Boot usa para JUnit 5 y Mockito -->
+		<junit-jupiter.version>5.11.4</junit-jupiter.version>
+		<mockito.version>5.14.2</mockito.version>
+
+		<!-- Compilador -->
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 	</properties>
 
+	<!-- ────────────────────────────────
+         Dependencias
+    ──────────────────────────────────── -->
 	<dependencies>
-		<!-- Spring Boot starters -->
+
+		<!-- ── Spring Boot starters ─────────────────────────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Spring Boot devtools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- ── DevTools (solo en runtime) ───────────────────────── -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -42,27 +66,19 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- PostgreSQL driver -->
+		<!-- ── Driver PostgreSQL ────────────────────────────────── -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Testing -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- MapStruct -->
+		<!-- ── MapStruct ────────────────────────────────────────── -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>1.5.5.Final</version>
 		</dependency>
-		<!-- MapStruct processor para compilación -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
@@ -70,14 +86,14 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- OpenAPI UI -->
+		<!-- ── OpenAPI (springdoc) ──────────────────────────────── -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.2.0</version>
 		</dependency>
 
-		<!-- Apache POI para Excel -->
+		<!-- ── Apache POI (Excel) ───────────────────────────────── -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -89,16 +105,69 @@
 			<version>5.2.3</version>
 		</dependency>
 
+		<!-- ── TESTING ──────────────────────────────────────────── -->
+
+		<!-- Starter de test de Spring Boot (trae Spring Test, AssertJ, Hamcrest, etc.) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<!-- Dejamos que use nuestras propiedades de versión -->
+		</dependency>
+
+		<!-- Mockito + JUnit 5 integración (versión gobernada por mockito.version) -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JUnit 5 -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.9.3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.4.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito JUnit Jupiter integration -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.4.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring test (opcional para @InjectMocks) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test</artifactId>
+			<version>3.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
 
+	<!-- ────────────────────────────────
+         Plugins de compilación
+    ──────────────────────────────────── -->
 	<build>
 		<plugins>
-			<!-- Plugin compilador con configuración para MapStruct -->
+			<!-- Compilador + MapStruct -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
