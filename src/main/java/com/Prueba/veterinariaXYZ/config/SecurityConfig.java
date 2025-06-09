@@ -30,7 +30,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
@@ -38,8 +38,10 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").authenticated() // Swagger protegido
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())  // Autenticación básica (popup)
-                .headers(headers -> headers.cacheControl(cache -> cache.disable()));  // Deshabilitar cache para que no recuerde credenciales
+                .httpBasic(httpBasic -> httpBasic
+                        .authenticationEntryPoint(customAuthenticationEntryPoint) // Usar entry point personalizado
+                )
+                .headers(headers -> headers.cacheControl(cache -> cache.disable()));
 
         return http.build();
     }
@@ -51,7 +53,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
