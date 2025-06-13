@@ -35,11 +35,11 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").authenticated() // Swagger protegido
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
-                        .authenticationEntryPoint(customAuthenticationEntryPoint) // Usar entry point personalizado
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
                 .headers(headers -> headers.cacheControl(cache -> cache.disable()));
 

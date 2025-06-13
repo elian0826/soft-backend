@@ -49,7 +49,14 @@ public class PacientesDao implements PacientesDaoInterfaz {
     public void update(Pacientes paciente) throws DaoException {
         String sql = "UPDATE pacientes SET nombre_mascota = ?, especie = ?, raza = ?, fecha_nacimiento = ?, tipo_identificacion_dueno = ?, identificacion_dueno = ?, nombre_dueno = ?, ciudad = ?, direccion = ?, telefono = ?, fecha_registro = ?, updated_at = ? WHERE id = ?";
         try {
-            jdbcTemplate.update(sql,
+            System.out.println("Intentando actualizar paciente con ID: " + paciente.getId());
+            System.out.println("Datos a actualizar:");
+            System.out.println("- Nombre mascota: " + paciente.getNombre_mascota());
+            System.out.println("- Especie: " + paciente.getEspecie());
+            System.out.println("- Raza: " + paciente.getRaza());
+            System.out.println("- ID Dueño: " + paciente.getIdentificacion_dueno());
+            
+            int rowsAffected = jdbcTemplate.update(sql,
                     paciente.getNombre_mascota(),
                     paciente.getEspecie(),
                     paciente.getRaza(),
@@ -64,7 +71,15 @@ public class PacientesDao implements PacientesDaoInterfaz {
                     paciente.getUpdated_at() != null ? Timestamp.valueOf(paciente.getUpdated_at()) : Timestamp.valueOf(LocalDateTime.now()),
                     paciente.getId()
             );
+            
+            System.out.println("Filas afectadas por la actualización: " + rowsAffected);
+            
+            if (rowsAffected == 0) {
+                throw new DaoException("No se encontró ningún paciente con el ID: " + paciente.getId());
+            }
+            
         } catch (DataAccessException ex) {
+            System.err.println("Error al actualizar paciente: " + ex.getMessage());
             throw new DaoException("Error al actualizar paciente: " + ex.getMessage(), ex);
         }
     }

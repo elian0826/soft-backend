@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,8 +27,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     @Override
     public void insert(PacientesDto dto) {
         try {
-            pacientesDmInterfaz.createPaciente(
-                    PacientesMapper.mapper.toPacientes(dto));
+            pacientesDmInterfaz.createPaciente(PacientesMapper.mapper.toPacientes(dto));
         } catch (DmException e) {
             throw new RuntimeException(e);
         }
@@ -38,8 +36,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     @Override
     public void update(PacientesDto dto) {
         try {
-            pacientesDmInterfaz.updatePaciente(
-                    PacientesMapper.mapper.toPacientes(dto));
+            pacientesDmInterfaz.updatePaciente(PacientesMapper.mapper.toPacientes(dto));
         } catch (DmException e) {
             throw new RuntimeException(e);
         }
@@ -57,8 +54,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     @Override
     public PacientesDto findById(Integer id) {
         try {
-            return PacientesMapper.mapper.toPacientesDto(
-                    pacientesDmInterfaz.getPacienteById(id));
+            return PacientesMapper.mapper.toPacientesDto(pacientesDmInterfaz.getPacienteById(id));
         } catch (DmException e) {
             throw new RuntimeException(e);
         }
@@ -67,8 +63,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
     @Override
     public List<PacientesDto> findAll() {
         try {
-            return PacientesMapper.mapper.toListEntityDto(
-                    pacientesDmInterfaz.getAllPacientes());
+            return PacientesMapper.mapper.toListEntityDto(pacientesDmInterfaz.getAllPacientes());
         } catch (DmException e) {
             throw new RuntimeException(e);
         }
@@ -82,12 +77,15 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
 
         try (Workbook wb = new XSSFWorkbook()) {
             Sheet sheet = wb.createSheet("Pacientes");
-            String[] col = { "ID", "Nombre Mascota", "Especie", "Raza",
-                    "Fecha Nacimiento", "Tipo ID Dueño", "ID Dueño",
-                    "Nombre Dueño", "Ciudad", "Dirección", "Teléfono" };
+            String[] col = {
+                    "ID", "Nombre Mascota", "Especie", "Raza", "Fecha Nacimiento",
+                    "Tipo ID Dueño", "ID Dueño", "Nombre Dueño", "Ciudad", "Dirección", "Teléfono"
+            };
 
             Row header = sheet.createRow(0);
-            for (int i = 0; i < col.length; i++) header.createCell(i).setCellValue(col[i]);
+            for (int i = 0; i < col.length; i++) {
+                header.createCell(i).setCellValue(col[i]);
+            }
 
             int rowNum = 1;
             for (Pacientes p : pacientes) {
@@ -96,8 +94,7 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
                 row.createCell(1).setCellValue(nvl(p.getNombre_mascota()));
                 row.createCell(2).setCellValue(nvl(p.getEspecie()));
                 row.createCell(3).setCellValue(nvl(p.getRaza()));
-                row.createCell(4).setCellValue(p.getFecha_nacimiento() != null ?
-                        p.getFecha_nacimiento().toString() : "");
+                row.createCell(4).setCellValue(p.getFecha_nacimiento() != null ? p.getFecha_nacimiento().toString() : "");
                 row.createCell(5).setCellValue(nvl(p.getTipo_identificacion_dueno()));
                 row.createCell(6).setCellValue(nvl(p.getIdentificacion_dueno()));
                 row.createCell(7).setCellValue(nvl(p.getNombre_dueno()));
@@ -105,7 +102,10 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
                 row.createCell(9).setCellValue(nvl(p.getDireccion()));
                 row.createCell(10).setCellValue(nvl(p.getTelefono()));
             }
-            for (int i = 0; i < col.length; i++) sheet.autoSizeColumn(i);
+
+            for (int i = 0; i < col.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             wb.write(out);
@@ -113,86 +113,98 @@ public class AdmonPacientes implements AdmonPacientesInterfaz {
         }
     }
 
-
     @Override
     @Transactional
     public void importarPacientes(MultipartFile file) throws IOException {
-
-        /* 1️⃣  Cachear pacientes existentes --------------- */
         Map<String, PacientesDto> existentes = findAll().stream()
                 .collect(Collectors.toMap(
                         p -> key(p.getIdentificacion_dueno(), p.getNombre_mascota()),
-                        p -> p
+                        p -> p,
+                        (existing, replacement) -> existing
                 ));
 
         try (Workbook wb = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = wb.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
-            if (rows.hasNext()) rows.next();                      // salto encabezado
+            if (rows.hasNext()) rows.next(); // Saltar encabezado
 
             while (rows.hasNext()) {
                 Row row = rows.next();
                 PacientesDto dto = new PacientesDto();
 
-                /* 🔹 1. LEER ID (si lo hay) */
                 String idStr = getStringCellValue(row.getCell(0));
-                if (!idStr.isBlank()) {                    // ⇢ valor en la celda ID
-                    dto.setId(Integer.parseInt(idStr.trim()));
+                if (!idStr.isBlank()) {
+                    try {
+                        dto.setId(Integer.parseInt(idStr.trim()));
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
 
-                /* 🔹 2. Resto de columnas */
                 dto.setNombre_mascota(getStringCellValue(row.getCell(1)));
-                dto.setEspecie        (getStringCellValue(row.getCell(2)));
-                dto.setRaza           (getStringCellValue(row.getCell(3)));
+                dto.setEspecie(getStringCellValue(row.getCell(2)));
+                dto.setRaza(getStringCellValue(row.getCell(3)));
 
                 String fNac = getStringCellValue(row.getCell(4));
-                if (!fNac.isBlank()) dto.setFecha_nacimiento(LocalDate.parse(fNac));
+                if (!fNac.isBlank()) {
+                    try {
+                        dto.setFecha_nacimiento(LocalDate.parse(fNac));
+                    } catch (Exception e) {
+                        System.err.println("Fecha inválida: " + fNac);
+                    }
+                }
 
                 dto.setTipo_identificacion_dueno(getStringCellValue(row.getCell(5)));
-                dto.setIdentificacion_dueno      (getStringCellValue(row.getCell(6)));
-                dto.setNombre_dueno              (getStringCellValue(row.getCell(7)));
-                dto.setCiudad                    (getStringCellValue(row.getCell(8)));
-                dto.setDireccion                 (getStringCellValue(row.getCell(9)));
-                dto.setTelefono                  (getStringCellValue(row.getCell(10)));
+                dto.setIdentificacion_dueno(getStringCellValue(row.getCell(6)));
+                dto.setNombre_dueno(getStringCellValue(row.getCell(7)));
+                dto.setCiudad(getStringCellValue(row.getCell(8)));
+                dto.setDireccion(getStringCellValue(row.getCell(9)));
+                dto.setTelefono(getStringCellValue(row.getCell(10)));
 
-                /* 🔹 3. Decidir INSERT / UPDATE */
-                if (dto.getId() != null && dto.getId() > 0) {
-                    // El archivo ya traía ID explícito  →  UPDATE directo
-                    update(dto);
-                } else {
-                    // No hay ID, usamos la clave compuesta para saber si existe
-                    String key = key(dto.getIdentificacion_dueno(), dto.getNombre_mascota());
+                if (dto.getIdentificacion_dueno() == null || dto.getIdentificacion_dueno().isBlank() ||
+                        dto.getNombre_mascota() == null || dto.getNombre_mascota().isBlank()) {
+                    continue;
+                }
 
-                    if (existentes.containsKey(key)) {         // existe  →  UPDATE
-                        dto.setId(existentes.get(key).getId());
+                String key = key(dto.getIdentificacion_dueno(), dto.getNombre_mascota());
+
+                try {
+                    if (dto.getId() != null) {
                         update(dto);
-                    } else {                                   // nuevo  →  INSERT
+                        System.out.println("✔️ Actualizado por ID: " + dto.getId());
+                    } else if (existentes.containsKey(key)) {
+                        PacientesDto existente = existentes.get(key);
+                        dto.setId(existente.getId());
+                        update(dto);
+                        System.out.println("🔄 Actualizado por clave: " + key);
+                    } else {
                         insert(dto);
+                        System.out.println("➕ Insertado nuevo: " + key);
                     }
+                } catch (Exception e) {
+                    System.err.println("❌ Error con paciente: " + key);
+                    throw e;
                 }
             }
         }
     }
 
+    /* ========================== Helpers ========================== */
 
-    /* ====================================================== *
-     *  Helpers
-     * ====================================================== */
-    private String nvl(String s) { return s != null ? s : ""; }
-
-    private String key(String identificacion, String nombreMascota) {
-        return (identificacion == null ? "" : identificacion.trim()) + "|" +
-                (nombreMascota   == null ? "" : nombreMascota.trim()).toLowerCase();
+    private String nvl(String s) {
+        return s != null ? s : "";
     }
 
-    /** Lee la celda como String, detectando fechas y números. */
+    private String key(String identificacion, String nombreMascota) {
+        return (identificacion == null ? "" : identificacion.trim().toLowerCase()) + "|" +
+                (nombreMascota == null ? "" : nombreMascota.trim().toLowerCase());
+    }
+
     private String getStringCellValue(Cell cell) {
         if (cell == null) return "";
         return switch (cell.getCellType()) {
             case STRING  -> cell.getStringCellValue();
             case NUMERIC -> DateUtil.isCellDateFormatted(cell)
-                    ? cell.getLocalDateTimeCellValue()
-                    .toLocalDate().toString()
+                    ? cell.getLocalDateTimeCellValue().toLocalDate().toString()
                     : longOrDouble(cell.getNumericCellValue());
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
             case FORMULA -> cell.getCellFormula();
